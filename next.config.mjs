@@ -25,6 +25,8 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': '.',
+      '@components': './components',
+      '@lib': './lib',
     }
     return config
   },
