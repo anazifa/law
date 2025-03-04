@@ -1,3 +1,5 @@
+'use client'
+
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 
@@ -30,29 +32,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('auth-token')
-        if (token) {
-          // Validate token with your backend
-          const response = await fetch('/api/auth/validate', {
-            headers: { Authorization: `Bearer ${token}` }
-          })
-          if (response.ok) {
-            const userData = await response.json()
-            setUser(userData)
-          } else {
-            localStorage.removeItem('auth-token')
+    // Check if we're in the browser environment
+    if (typeof window !== 'undefined') {
+      // Check if user is logged in on mount
+      const checkAuth = async () => {
+        try {
+          const token = localStorage.getItem('auth-token')
+          if (token) {
+            // Validate token with your backend
+            const response = await fetch('/api/auth/validate', {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            if (response.ok) {
+              const userData = await response.json()
+              setUser(userData)
+            } else {
+              localStorage.removeItem('auth-token')
+            }
           }
+        } catch (error) {
+          console.error('Auth check failed:', error)
+        } finally {
+          setLoading(false)
         }
-      } catch (error) {
-        console.error('Auth check failed:', error)
-      } finally {
-        setLoading(false)
       }
+      checkAuth()
+    } else {
+      setLoading(false)
     }
-    checkAuth()
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -68,7 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const { user: userData, token } = await response.json()
-      localStorage.setItem('auth-token', token)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth-token', token)
+      }
       setUser(userData)
     } catch (error) {
       console.error('Login error:', error)
@@ -95,7 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const { user: newUser, token } = await response.json()
-      localStorage.setItem('auth-token', token)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth-token', token)
+      }
       setUser(newUser)
     } catch (error) {
       console.error('Signup error:', error)
@@ -104,7 +115,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    localStorage.removeItem('auth-token')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth-token')
+    }
     setUser(null)
   }
 
