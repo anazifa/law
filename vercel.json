@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && npm install -D tailwindcss@latest postcss@latest autoprefixer@latest && npm run build",
-  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --legacy-peer-deps && npm install -D tailwindcss@latest postcss@latest autoprefixer@latest",
   "framework": "nextjs",
   "builds": [
     {
